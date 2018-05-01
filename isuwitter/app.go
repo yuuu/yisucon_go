@@ -472,9 +472,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 	if until == "" {
-		rows, err = db.Query(`SELECT * FROM tweets WHERE text LIKE ? ORDER BY id DESC`, "%"+query+"%")
+		rows, err = db.Query(`SELECT * FROM tweets WHERE text LIKE ? ORDER BY id DESC LIMIT ?`, "%"+query+"%", perPage*2)
 	} else {
-		rows, err = db.Query(`SELECT * FROM tweets WHERE created_at < ? AND text LIKE ? ORDER BY created_at DESC`, until, "%"+query+"%")
+		rows, err = db.Query(`SELECT * FROM tweets WHERE created_at < ? AND text LIKE ? ORDER BY created_at DESC LIMIT ?`, until, "%"+query+"%", perPage*2)
 	}
 	if err != nil {
 		if err == sql.ErrNoRows {
