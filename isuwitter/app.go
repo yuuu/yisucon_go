@@ -599,6 +599,8 @@ func main() {
 		"number": 100,
 	}).Debug("The ice breaks!")
 
+	fmt.Println("test")
+
 	host := os.Getenv("ISUWITTER_DB_HOST")
 	if host == "" {
 		host = "localhost"
