@@ -98,7 +98,15 @@ func loadFriends(name string) ([]string, error) {
 	var data struct {
 		Result []string `json:"friends"`
 	}
+
 	err = json.NewDecoder(resp.Body).Decode(&data)
+
+	userID := getuserID(name)
+	for _, friend := range data.Result {
+		friendID := getuserID(friend)
+		db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, userID, friendID)
+	}
+
 	return data.Result, err
 }
 
