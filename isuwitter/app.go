@@ -124,7 +124,7 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	go create_friends
+	go create_friends()
 
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
 }
