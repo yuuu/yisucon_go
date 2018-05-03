@@ -539,6 +539,11 @@ func css(w http.ResponseWriter, r *http.Request) {
 	w.Write(fileRead("./public/css/style.css"))
 }
 
+func favicon(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "image/png")
+	w.Write(fileRead("./public/favicon.ico"))
+}
+
 func fileRead(fp string) []byte {
 	fs, err := os.Open(fp)
 
@@ -614,6 +619,7 @@ func main() {
 	l.Methods("POST").HandlerFunc(loginHandler)
 	r.HandleFunc("/logout", logoutHandler)
 
+	r.PathPrefix("/favicon.ico").HandlerFunc(favicon)
 	r.PathPrefix("/css/style.css").HandlerFunc(css)
 	r.PathPrefix("/js/script.js").HandlerFunc(js)
 
