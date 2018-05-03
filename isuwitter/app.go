@@ -101,12 +101,6 @@ func loadFriends(name string) ([]string, error) {
 
 	err = json.NewDecoder(resp.Body).Decode(&data)
 
-	userID := getuserID(name)
-	for _, friend := range data.Result {
-		friendID := getuserID(friend)
-		db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, userID, friendID)
-	}
-
 	return data.Result, err
 }
 
@@ -131,6 +125,15 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
+
+	for i := 1; i <= 1000; i++ {
+		name := getUserName(i)
+		friends, _ := loadFriends(name)
+		for _, friend := range friends {
+			friendID := getuserID(friend)
+			db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, i, friendID)
+		}
+	}
 }
 
 func topHandler(w http.ResponseWriter, r *http.Request) {
