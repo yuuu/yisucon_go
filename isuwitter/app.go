@@ -588,7 +588,7 @@ func fileRead(fp string) []byte {
 }
 
 func main() {
-	file, _ := os.Create("/var/www/webapp/go/isuwitter/log.txt")
+	file, _ := os.Create("/home/ec2-user/log")
 	defer file.Close()
 	logrus.SetFormatter(&logrus.TextFormatter{})
 	logrus.SetOutput(file)
