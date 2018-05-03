@@ -588,8 +588,10 @@ func fileRead(fp string) []byte {
 }
 
 func main() {
+	file, _ := os.Create("log")
+	defer file.Close()
 	logrus.SetFormatter(&logrus.TextFormatter{})
-	logrus.SetOutput(os.Stdout)
+	logrus.SetOutput(file)
 	logrus.SetLevel(logrus.DebugLevel)
 
 	logrus.WithFields(logrus.Fields{
