@@ -132,14 +132,11 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 
 func createFriends() {
 	for i := 1; i <= 1000; i++ {
-		//name := getUserName(i)
-		//friends, _ := loadFriends(name)
-		// for _, friend := range friends {
-		// 	friendID := getuserID(friend)
-		// 	db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, i, friendID)
-		// }
-		for j := 1; j <= 500; j++ {
-			db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, i, j)
+		name := getUserName(i)
+		friends, _ := loadFriends(name)
+		for _, friend := range friends {
+			friendID := getuserID(friend)
+			db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, i, friendID)
 		}
 	}
 
