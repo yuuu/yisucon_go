@@ -124,12 +124,12 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	go create_friends()
+	createFriends()
 
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
 }
 
-func create_friends() {
+func createFriends() {
 	for i := 1; i <= 1000; i++ {
 		name := getUserName(i)
 		friends, _ := loadFriends(name)
