@@ -4,3 +4,4 @@ import:
 - package: github.com/gorilla/mux
 - package: github.com/gorilla/sessions
 - package: github.com/unrolled/render
+- package: github.com/sirupsen/logrus

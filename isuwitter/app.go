@@ -20,6 +20,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
+	"github.com/sirupsen/logrus"
 	"github.com/unrolled/render"
 )
 
@@ -587,6 +588,15 @@ func fileRead(fp string) []byte {
 }
 
 func main() {
+	logrus.SetFormatter(&logrus.TextFormatter{})
+	logrus.SetOutput(os.Stdout)
+	logrus.SetLevel(logrus.DebugLevel)
+
+	logrus.WithFields(logrus.Fields{
+		"omg":    true,
+		"number": 100,
+	}).Debug("The ice breaks!")
+
 	host := os.Getenv("ISUWITTER_DB_HOST")
 	if host == "" {
 		host = "localhost"
