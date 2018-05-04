@@ -39,13 +39,6 @@ type User struct {
 	Password string
 }
 
-type Friend struct {
-	ID       int
-	UserID   int
-	FriendID int
-	Enable   int
-}
-
 const (
 	sessionName     = "isuwitter_session"
 	sessionSecret   = "isuwitter"
@@ -99,13 +92,13 @@ func loadFriends(name string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	id := 0
 	for rows.Next() {
-		friend := Friend{}
-		err := rows.Scan(&friend.ID, &friend.UserID, &friend.FriendID, &friend.Enable)
+		err := rows.Scan(&id)
 		if err != nil && err != sql.ErrNoRows {
 			return nil, err
 		}
-		friends = append(friends, getUserName(friend.UserID))
+		friends = append(friends, getUserName(id))
 	}
 	return friends, nil
 }
