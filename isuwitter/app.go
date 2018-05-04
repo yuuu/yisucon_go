@@ -123,7 +123,7 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path, err := exec.LookPath("sudo mysql")
+	path, err := exec.LookPath("mysql")
 	if err != nil {
 		fmt.Println("failed LookPath", err.Error())
 		badRequest(w)
@@ -135,6 +135,12 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("failed Command", err.Error())
 		badRequest(w)
 		return
+	}
+
+	fmt.Println("success Command")
+	for {
+		time.Sleep(time.Second)
+
 	}
 
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
