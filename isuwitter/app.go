@@ -88,7 +88,7 @@ func htmlify(tweet string) string {
 
 func loadFriends(name string) ([]string, error) {
 	friends := make([]string, 0)
-	rows, err := db.Query("SELECT friend_id FROM friends WHERE user_id = ?", getuserID(name))
+	rows, err := db.Query("SELECT friend_id FROM friends WHERE user_id = ? AND enable = 1", getuserID(name))
 	if err != nil {
 		return nil, err
 	}
@@ -287,8 +287,8 @@ func followHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("follow", getuserID(r.FormValue("user")), "<-", userID)
-	_, err := db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, userID, getuserID(r.FormValue("user")))
+	_, err := db.Exec(`UPDATE friends SET enable = 1 WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
+	//_, err := db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, userID, getuserID(r.FormValue("user")))
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
@@ -306,8 +306,8 @@ func unfollowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("unfollow", getuserID(r.FormValue("user")), "<-", userID)
-	_, err := db.Exec(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
+	_, err := db.Exec(`UPDATE friends SET enable = 0 WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
+	//_, err := db.Exec(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
