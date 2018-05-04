@@ -86,19 +86,19 @@ func htmlify(tweet string) string {
 	return tweet
 }
 
-func loadFriends(name string) ([]string, error) {
-	friends := make([]string, 0)
-	rows, err := db.Query("SELECT friend_id FROM friends WHERE user_id = ? AND enable = 1", getuserID(name))
+func loadFriends(userID int) ([]int, error) {
+	friends := make([]int, 0)
+	rows, err := db.Query("SELECT friend_id FROM friends WHERE user_id = ? AND enable = 1", userID)
 	if err != nil {
 		return nil, err
 	}
-	id := 0
 	for rows.Next() {
+		id := 0
 		err := rows.Scan(&id)
 		if err != nil && err != sql.ErrNoRows {
 			return nil, err
 		}
-		friends = append(friends, getUserName(id))
+		friends = append(friends, id)
 	}
 	return friends, nil
 }
@@ -165,7 +165,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	result, err := loadFriends(name)
+	result, err := loadFriends(userID.(int))
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
@@ -192,7 +192,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, x := range result {
-			if x == t.UserName {
+			if x == t.UserID {
 				tweets = append(tweets, &t)
 				break
 			}
@@ -351,7 +351,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 
 	isFriend := false
 	if name != "" {
-		result, err := loadFriends(name)
+		result, err := loadFriends(sessionUID.(int))
 		if err != nil {
 			badRequest(w)
 			fmt.Println(err.Error())
@@ -359,7 +359,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, x := range result {
-			if x == user {
+			if x == userID {
 				isFriend = true
 				break
 			}
