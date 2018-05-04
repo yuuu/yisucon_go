@@ -571,8 +571,6 @@ func fileRead(fp string) []byte {
 }
 
 func main() {
-	fmt.Println("test")
-
 	host := os.Getenv("ISUWITTER_DB_HOST")
 	if host == "" {
 		host = "localhost"
