@@ -123,7 +123,7 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path, err := exec.LookPath("mysql")
+	path, err := exec.LookPath("sudo mysql")
 	if err != nil {
 		fmt.Println("failed LookPath", err.Error())
 		badRequest(w)
