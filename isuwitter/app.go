@@ -125,23 +125,18 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 
 	path, err := exec.LookPath("mysql")
 	if err != nil {
-		fmt.Println("failed LookPath", err.Error())
 		badRequest(w)
 		return
 	}
 
-	exec.Command(path, "-u", "root", "-D", "isuwitter", "<", "../../sql/seed_friends.sql").Run()
+	err = exec.Command(path, "-u", "root", "-D", "isuwitter", "<", "../../sql/seed_friends.sql").Run()
 	if err != nil {
-		fmt.Println("failed Command", err.Error())
+		fmt.Println("failed Command: ", err.Error())
 		badRequest(w)
 		return
 	}
 
 	fmt.Println("success Command")
-	for {
-		time.Sleep(time.Second)
-
-	}
 
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
 }
