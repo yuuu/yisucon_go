@@ -107,12 +107,14 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := db.Exec(`DELETE FROM tweets WHERE id > 100000`)
 	if err != nil {
 		badRequest(w)
+		fmt.Println(err.Error())
 		return
 	}
 
 	_, err = db.Exec(`DELETE FROM users WHERE id > 1000`)
 	if err != nil {
 		badRequest(w)
+		fmt.Println(err.Error())
 		return
 	}
 
@@ -182,6 +184,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		badRequest(w)
+		fmt.Println(err.Error())
 		return
 	}
 	defer rows.Close()
@@ -189,6 +192,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	result, err := loadFriends(name)
 	if err != nil {
 		badRequest(w)
+		fmt.Println(err.Error())
 		return
 	}
 
@@ -198,6 +202,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
 		if err != nil && err != sql.ErrNoRows {
 			badRequest(w)
+			fmt.Println(err.Error())
 			return
 		}
 		t.HTML = htmlify(t.Text)
@@ -206,6 +211,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 		t.UserName = getUserName(t.UserID)
 		if t.UserName == "" {
 			badRequest(w)
+			fmt.Println("non username")
 			return
 		}
 
@@ -261,6 +267,7 @@ func tweetPostHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := db.Exec(`INSERT INTO tweets (user_id, text, created_at) VALUES (?, ?, NOW())`, userID, text)
 	if err != nil {
 		badRequest(w)
+		fmt.Println(err.Error())
 		return
 	}
 
@@ -307,6 +314,7 @@ func followHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := db.Exec(`INSERT INTO friends (user_id, fritnd_id) VALUES (?, ?)`, getuserID(r.FormValue("user")), userID)
 	if err != nil {
 		badRequest(w)
+		fmt.Println(err.Error())
 		return
 	}
 
@@ -324,6 +332,7 @@ func unfollowHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := db.Exec(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`, getuserID(r.FormValue("user")), userID)
 	if err != nil {
 		badRequest(w)
+		fmt.Println(err.Error())
 		return
 	}
 
@@ -369,6 +378,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		result, err := loadFriends(name)
 		if err != nil {
 			badRequest(w)
+			fmt.Println(err.Error())
 			return
 		}
 
@@ -394,6 +404,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		badRequest(w)
+		fmt.Println(err.Error())
 		return
 	}
 	defer rows.Close()
@@ -404,6 +415,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
 		if err != nil && err != sql.ErrNoRows {
 			badRequest(w)
+			fmt.Println(err.Error())
 			return
 		}
 		t.HTML = htmlify(t.Text)
@@ -466,6 +478,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		badRequest(w)
+		fmt.Println(err.Error())
 		return
 	}
 	defer rows.Close()
@@ -476,6 +489,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
 		if err != nil && err != sql.ErrNoRows {
 			badRequest(w)
+			fmt.Println(err.Error())
 			return
 		}
 		t.HTML = htmlify(t.Text)
@@ -483,6 +497,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		t.UserName = getUserName(t.UserID)
 		if t.UserName == "" {
 			badRequest(w)
+			fmt.Println("non username")
 			return
 		}
 		if strings.Index(t.HTML, query) != -1 {
