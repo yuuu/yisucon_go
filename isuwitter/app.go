@@ -131,7 +131,8 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 
 	out, err := exec.Command(path, "-u", "root", "-D", "isuwitter", "<", "../../sql/seed_friends.sql").Output()
 	if err != nil {
-		fmt.Println("failed Command:", err.Error(), out)
+		fmt.Println("failed Command:", err.Error())
+		fmt.Printf("%s¥n", out)
 		badRequest(w)
 		return
 	}
