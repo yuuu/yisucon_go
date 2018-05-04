@@ -311,7 +311,7 @@ func followHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := db.Exec(`INSERT INTO friends (user_id, fritnd_id) VALUES (?, ?)`, getuserID(r.FormValue("user")), userID)
+	_, err := db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, getuserID(r.FormValue("user")), userID)
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
