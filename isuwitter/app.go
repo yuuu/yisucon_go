@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"crypto/sha1"
 	"database/sql"
 	"errors"
@@ -12,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -112,6 +112,24 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = db.Exec(`DELETE FROM users WHERE id > 1000`)
+	if err != nil {
+		badRequest(w)
+		return
+	}
+
+	_, err = db.Exec(`DELETE FROM friends WHERE id > 0`)
+	if err != nil {
+		badRequest(w)
+		return
+	}
+
+	path, err := exec.LookPath("mysql")
+	if err != nil {
+		badRequest(w)
+		return
+	}
+
+	exec.Command(path, "-u", "root", "-D", "isuwitter", "<", "../../sql/seed_friends.sql").Run()
 	if err != nil {
 		badRequest(w)
 		return
@@ -274,33 +292,15 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func followHandler(w http.ResponseWriter, r *http.Request) {
-	var userName string
 	session := getSession(w, r)
 	userID, ok := session.Values["user_id"]
-	if ok {
-		u := getUserName(userID.(int))
-		if u == "" {
-			http.Redirect(w, r, "/", http.StatusFound)
-			return
-		}
-		userName = u
-	} else {
+	if !ok {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
 
-	jsonStr := `{"user":"` + r.FormValue("user") + `"}`
-	fmt.Println("fromUser", r.FormValue("user"))
-	req, err := http.NewRequest(http.MethodPost, pathURIEscape(isutomoEndpoint+"/"+userName), bytes.NewBuffer([]byte(jsonStr)))
-
+	_, err := db.Exec(`INSERT INTO friends (user_id, fritnd_id) VALUES (?, ?)`, getuserID(r.FormValue("user")), userID)
 	if err != nil {
-		badRequest(w)
-		return
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-
-	if err != nil || resp.StatusCode != 200 {
 		badRequest(w)
 		return
 	}
@@ -309,32 +309,15 @@ func followHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func unfollowHandler(w http.ResponseWriter, r *http.Request) {
-	var userName string
 	session := getSession(w, r)
 	userID, ok := session.Values["user_id"]
-	if ok {
-		u := getUserName(userID.(int))
-		if u == "" {
-			http.Redirect(w, r, "/", http.StatusFound)
-			return
-		}
-		userName = u
-	} else {
+	if !ok {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
 
-	jsonStr := `{"user":"` + r.FormValue("user") + `"}`
-	req, err := http.NewRequest(http.MethodDelete, pathURIEscape(isutomoEndpoint+"/"+userName), bytes.NewBuffer([]byte(jsonStr)))
-
+	_, err := db.Exec(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`, getuserID(r.FormValue("user")), userID)
 	if err != nil {
-		badRequest(w)
-		return
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-
-	if err != nil || resp.StatusCode != 200 {
 		badRequest(w)
 		return
 	}
