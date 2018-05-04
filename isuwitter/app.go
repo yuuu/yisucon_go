@@ -93,12 +93,12 @@ func loadFriends(name string) ([]string, error) {
 		return nil, err
 	}
 	for rows.Next() {
-		friendID := 0
-		err := rows.Scan(&friendID)
+		user := User{}
+		err := rows.Scan(&user.ID)
 		if err != nil && err != sql.ErrNoRows {
 			return nil, err
 		}
-		friends = append(friends, getUserName(friendID))
+		friends = append(friends, getUserName(user.ID))
 	}
 	return friends, nil
 }
