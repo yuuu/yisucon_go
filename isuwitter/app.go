@@ -118,30 +118,6 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// _, err = db.Exec(`DELETE FROM friends WHERE id > 0`)
-	// if err != nil {
-	// 	badRequest(w)
-	// 	return
-	// }
-
-	// path, err := exec.LookPath("mysql")
-	// if err != nil {
-	// 	badRequest(w)
-	// 	return
-	// }
-
-	// cmd := exec.Command("mysql", "-u", "root", "isuwitter", "<", "./seed_friends.sql")
-	// cmd.Stderr = os.Stderr
-	// cmd.Stdout = os.Stdout
-	// cmd.Run()
-	// if err != nil {
-	// 	fmt.Println("failed Command:", err.Error())
-	// 	badRequest(w)
-	// 	return
-	// }
-
-	// fmt.Println("success Command")
-
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
 }
 
@@ -312,7 +288,7 @@ func followHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("follow", getuserID(r.FormValue("user")), "<-", userID)
-	_, err := db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, getuserID(r.FormValue("user")), userID)
+	_, err := db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, userID, getuserID(r.FormValue("user")))
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
@@ -331,7 +307,7 @@ func unfollowHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("unfollow", getuserID(r.FormValue("user")), "<-", userID)
-	_, err := db.Exec(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`, getuserID(r.FormValue("user")), userID)
+	_, err := db.Exec(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
