@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/sha1"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"html"
@@ -89,17 +88,20 @@ func htmlify(tweet string) string {
 }
 
 func loadFriends(name string) ([]string, error) {
-	resp, err := http.DefaultClient.Get(pathURIEscape(fmt.Sprintf("%s/%s", isutomoEndpoint, name)))
+	friends := make([]string, 0)
+	rows, err := db.Query("SELECT friend_id FROM friends WHERE user_id = ?", getuserID(name))
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	var data struct {
-		Result []string `json:"friends"`
+	for rows.Next() {
+		friendID := 0
+		err := rows.Scan(&friendID)
+		if err != nil && err != sql.ErrNoRows {
+			return nil, err
+		}
+		friends = append(friends, getUserName(friendID))
 	}
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return data.Result, err
+	return friends, nil
 }
 
 func initializeHandler(w http.ResponseWriter, r *http.Request) {
@@ -114,13 +116,6 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		badRequest(w)
 		return
 	}
-
-	resp, err := http.Get(fmt.Sprintf("%s/initialize", isutomoEndpoint))
-	if err != nil {
-		badRequest(w)
-		return
-	}
-	defer resp.Body.Close()
 
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
 }
@@ -295,6 +290,7 @@ func followHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonStr := `{"user":"` + r.FormValue("user") + `"}`
+	fmt.Println("fromUser", r.FormValue("user"))
 	req, err := http.NewRequest(http.MethodPost, pathURIEscape(isutomoEndpoint+"/"+userName), bytes.NewBuffer([]byte(jsonStr)))
 
 	if err != nil {
