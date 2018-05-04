@@ -149,9 +149,9 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 	if until == "" {
-		rows, err = db.Query(`SELECT * FROM tweets ORDER BY id DESC LIMIT ?`, perPage*2)
+		rows, err = db.Query(`SELECT * FROM tweets ORDER BY id DESC LIMIT ?`, perPage*4)
 	} else {
-		rows, err = db.Query(`SELECT * FROM tweets WHERE created_at < ? ORDER BY created_at DESC LIMIT ?`, until, perPage*2)
+		rows, err = db.Query(`SELECT * FROM tweets WHERE created_at < ? ORDER BY created_at DESC LIMIT ?`, until, perPage*4)
 	}
 
 	if err != nil {
@@ -288,7 +288,6 @@ func followHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err := db.Exec(`UPDATE friends SET enable = 1 WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
-	//_, err := db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, userID, getuserID(r.FormValue("user")))
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
@@ -307,7 +306,6 @@ func unfollowHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err := db.Exec(`UPDATE friends SET enable = 0 WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
-	//_, err := db.Exec(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
@@ -372,9 +370,9 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 	if until == "" {
-		rows, err = db.Query(`SELECT * FROM tweets WHERE user_id = ? ORDER BY id DESC LIMIT ?`, userID, perPage*2)
+		rows, err = db.Query(`SELECT * FROM tweets WHERE user_id = ? ORDER BY id DESC LIMIT ?`, userID, perPage*4)
 	} else {
-		rows, err = db.Query(`SELECT * FROM tweets WHERE user_id = ? AND created_at < ? ORDER BY created_at DESC LIMIT ?`, userID, until, perPage*2)
+		rows, err = db.Query(`SELECT * FROM tweets WHERE user_id = ? AND created_at < ? ORDER BY created_at DESC LIMIT ?`, userID, until, perPage*4)
 	}
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -446,9 +444,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 	if until == "" {
-		rows, err = db.Query(`SELECT * FROM tweets WHERE text LIKE ? ORDER BY id DESC LIMIT ?`, "%"+query+"%", perPage*2)
+		rows, err = db.Query(`SELECT * FROM tweets WHERE text LIKE ? ORDER BY id DESC LIMIT ?`, "%"+query+"%", perPage*4)
 	} else {
-		rows, err = db.Query(`SELECT * FROM tweets WHERE created_at < ? AND text LIKE ? ORDER BY created_at DESC LIMIT ?`, until, "%"+query+"%", perPage*2)
+		rows, err = db.Query(`SELECT * FROM tweets WHERE created_at < ? AND text LIKE ? ORDER BY created_at DESC LIMIT ?`, until, "%"+query+"%", perPage*4)
 	}
 	if err != nil {
 		if err == sql.ErrNoRows {
