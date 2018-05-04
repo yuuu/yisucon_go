@@ -294,7 +294,7 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exec.Command(path, "-u", "root", "-D", "isutomo", "<", "../../sql/seed_isutomo2.sql").Run()
+	exec.Command(path, "-u", "root", "-D", "isutomo", "<", "../../sql/seed_isutomo.sql").Run()
 	if err != nil {
 		errorResponseWriter(w, http.StatusInternalServerError, err)
 		return
