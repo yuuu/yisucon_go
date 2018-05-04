@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -288,17 +287,17 @@ func JSONUnmarshaler(body io.Reader, i interface{}) error {
 	return nil
 }
 func initializeHandler(w http.ResponseWriter, r *http.Request) {
-	path, err := exec.LookPath("mysql")
-	if err != nil {
-		errorResponseWriter(w, http.StatusInternalServerError, err)
-		return
-	}
+	// path, err := exec.LookPath("mysql")
+	// if err != nil {
+	// 	errorResponseWriter(w, http.StatusInternalServerError, err)
+	// 	return
+	// }
 
-	exec.Command(path, "-u", "root", "-D", "isutomo", "<", "../../sql/seed_isutomo.sql").Run()
-	if err != nil {
-		errorResponseWriter(w, http.StatusInternalServerError, err)
-		return
-	}
+	// exec.Command(path, "-u", "root", "-D", "isutomo", "<", "../../sql/seed_isutomo2.sql").Run()
+	// if err != nil {
+	// 	errorResponseWriter(w, http.StatusInternalServerError, err)
+	// 	return
+	// }
 
 	resultJSON, err := json.Marshal(struct {
 		Result []string `json:"result"`
