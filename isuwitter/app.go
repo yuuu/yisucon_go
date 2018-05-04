@@ -311,6 +311,7 @@ func followHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("follow", getuserID(r.FormValue("user")), "<-", userID)
 	_, err := db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, getuserID(r.FormValue("user")), userID)
 	if err != nil {
 		badRequest(w)
@@ -329,6 +330,7 @@ func unfollowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("unfollow", getuserID(r.FormValue("user")), "<-", userID)
 	_, err := db.Exec(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`, getuserID(r.FormValue("user")), userID)
 	if err != nil {
 		badRequest(w)
