@@ -129,7 +129,7 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	cmd := exec.Command("mysql", "-u", "root", "isuwitter", "<", "./sql/seed_friends.sql")
+	cmd := exec.Command("mysql", "-u", "root", "isuwitter", "<", "./seed_friends.sql")
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	cmd.Run()
