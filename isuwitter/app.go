@@ -123,16 +123,17 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path, err := exec.LookPath("mysql")
-	if err != nil {
-		badRequest(w)
-		return
-	}
+	// path, err := exec.LookPath("mysql")
+	// if err != nil {
+	// 	badRequest(w)
+	// 	return
+	// }
 
-	cmd := exec.Command(path, "-u", "root", "-D", "isuwitter", "<", "../../sql/seed_friends.sql")
+	//cmd := exec.Command(path, "-u", "root", "-D", "isuwitter", "<", "../../sql/seed_friends.sql")
+	cmd := exec.Command("pwd")
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
-	err = cmd.Run()
+	cmd.Run()
 	if err != nil {
 		fmt.Println("failed Command:", err.Error())
 		badRequest(w)
