@@ -20,7 +20,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/sirupsen/logrus"
 	"github.com/unrolled/render"
 )
 
@@ -99,9 +98,7 @@ func loadFriends(name string) ([]string, error) {
 	var data struct {
 		Result []string `json:"friends"`
 	}
-
 	err = json.NewDecoder(resp.Body).Decode(&data)
-
 	return data.Result, err
 }
 
@@ -125,21 +122,7 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	go createFriends()
-
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
-}
-
-func createFriends() {
-	for i := 1; i <= 1000; i++ {
-		name := getUserName(i)
-		friends, _ := loadFriends(name)
-		for _, friend := range friends {
-			friendID := getuserID(friend)
-			db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, i, friendID)
-		}
-	}
-
 }
 
 func topHandler(w http.ResponseWriter, r *http.Request) {
@@ -588,17 +571,6 @@ func fileRead(fp string) []byte {
 }
 
 func main() {
-	file, _ := os.Create("/home/ec2-user/log")
-	defer file.Close()
-	logrus.SetFormatter(&logrus.TextFormatter{})
-	logrus.SetOutput(file)
-	logrus.SetLevel(logrus.DebugLevel)
-
-	logrus.WithFields(logrus.Fields{
-		"omg":    true,
-		"number": 100,
-	}).Debug("The ice breaks!")
-
 	fmt.Println("test")
 
 	host := os.Getenv("ISUWITTER_DB_HOST")
