@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -117,11 +116,11 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = db.Exec(`DELETE FROM friends WHERE id > 0`)
-	if err != nil {
-		badRequest(w)
-		return
-	}
+	// _, err = db.Exec(`DELETE FROM friends WHERE id > 0`)
+	// if err != nil {
+	// 	badRequest(w)
+	// 	return
+	// }
 
 	// path, err := exec.LookPath("mysql")
 	// if err != nil {
@@ -129,17 +128,17 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	cmd := exec.Command("mysql", "-u", "root", "isuwitter", "<", "./seed_friends.sql")
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	cmd.Run()
-	if err != nil {
-		fmt.Println("failed Command:", err.Error())
-		badRequest(w)
-		return
-	}
+	// cmd := exec.Command("mysql", "-u", "root", "isuwitter", "<", "./seed_friends.sql")
+	// cmd.Stderr = os.Stderr
+	// cmd.Stdout = os.Stdout
+	// cmd.Run()
+	// if err != nil {
+	// 	fmt.Println("failed Command:", err.Error())
+	// 	badRequest(w)
+	// 	return
+	// }
 
-	fmt.Println("success Command")
+	// fmt.Println("success Command")
 
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
 }
