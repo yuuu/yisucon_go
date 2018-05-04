@@ -86,9 +86,9 @@ func htmlify(tweet string) string {
 	return tweet
 }
 
-func loadFriends(name string) ([]string, error) {
+func loadFriends(userID int) ([]string, error) {
 	friends := make([]string, 0)
-	rows, err := db.Query("SELECT friend_id FROM friends WHERE user_id = ? AND enable = 1", getuserID(name))
+	rows, err := db.Query("SELECT friend_id FROM friends WHERE user_id = ? AND enable = 1", userID)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	result, err := loadFriends(name)
+	result, err := loadFriends(userID.(int))
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
@@ -351,7 +351,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 
 	isFriend := false
 	if name != "" {
-		result, err := loadFriends(name)
+		result, err := loadFriends(userID)
 		if err != nil {
 			badRequest(w)
 			fmt.Println(err.Error())
