@@ -88,7 +88,7 @@ func htmlify(tweet string) string {
 
 func loadFriends(userID int) ([]int, error) {
 	friends := make([]int, 0)
-	rows, err := db.Query("SELECT friend_id FROM friends WHERE user_id = ? AND enable = 1", userID)
+	rows, err := db.Query("SELECT friend_id FROM friends WHERE user_id = ?", userID)
 	if err != nil {
 		return nil, err
 	}
