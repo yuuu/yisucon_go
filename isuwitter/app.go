@@ -184,6 +184,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		tweets = append(tweets, &t)
 		if len(tweets) == perPage {
 			break
 		}
