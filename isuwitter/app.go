@@ -165,13 +165,6 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	result, err := loadFriends(userID.(int))
-	if err != nil {
-		badRequest(w)
-		fmt.Println(err.Error())
-		return
-	}
-
 	tweets := make([]*Tweet, 0)
 	for rows.Next() {
 		t := Tweet{}
@@ -191,12 +184,6 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		for _, x := range result {
-			if x == t.UserID {
-				tweets = append(tweets, &t)
-				break
-			}
-		}
 		if len(tweets) == perPage {
 			break
 		}
