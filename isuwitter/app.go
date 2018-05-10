@@ -170,7 +170,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	tweets := make([]*DispTweet, 0)
 	for rows.Next() {
 		t := Tweet{}
-		err := rows.Scan(&t)
+		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
 		if err != nil && err != sql.ErrNoRows {
 			badRequest(w)
 			fmt.Println(err.Error())
@@ -372,7 +372,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	tweets := make([]*DispTweet, 0)
 	for rows.Next() {
 		t := Tweet{}
-		err := rows.Scan(&t)
+		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
 		if err != nil && err != sql.ErrNoRows {
 			badRequest(w)
 			fmt.Println(err.Error())
