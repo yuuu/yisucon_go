@@ -41,6 +41,8 @@ type User struct {
 	Password string
 }
 
+var userNameCache [1000]*string
+
 const (
 	sessionName     = "isuwitter_session"
 	sessionSecret   = "isuwitter"
@@ -66,12 +68,16 @@ func getuserID(name string) int {
 }
 
 func getUserName(id int) string {
+	if userNameCache[id] != nil {
+		return *userNameCache[id]
+	}
 	row := db.QueryRow(`SELECT name FROM users WHERE id = ?`, id)
 	user := User{}
 	err := row.Scan(&user.Name)
 	if err != nil {
 		return ""
 	}
+	userNameCache[id] = &user.Name
 	return user.Name
 }
 
