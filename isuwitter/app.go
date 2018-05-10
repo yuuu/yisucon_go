@@ -26,7 +26,9 @@ type Tweet struct {
 	UserID    int
 	Text      string
 	CreatedAt time.Time
+}
 
+type DispTweet struct {
 	UserName string
 	HTML     string
 	Time     string
@@ -165,32 +167,29 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	tweets := make([]*Tweet, 0)
+	tweets := make([]*DispTweet, 0)
 	for rows.Next() {
 		t := Tweet{}
-		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
+		err := rows.Scan(&t)
 		if err != nil && err != sql.ErrNoRows {
 			badRequest(w)
 			fmt.Println(err.Error())
 			return
 		}
-		t.HTML = htmlify(t.Text)
-		t.Time = t.CreatedAt.Format("2006-01-02 15:04:05")
 
-		t.UserName = getUserName(t.UserID)
-		if t.UserName == "" {
+		userName := getUserName(t.UserID)
+		if userName == "" {
 			badRequest(w)
 			fmt.Println("non username")
 			return
 		}
-
-		tweets = append(tweets, &t)
+		tweets = append(tweets, &DispTweet{userName, htmlify(t.Text), t.CreatedAt.Format("2006-01-02 15:04:05")})
 	}
 
 	add := r.URL.Query().Get("append")
 	if add != "" {
 		re.HTML(w, http.StatusOK, "_tweets", struct {
-			Tweets []*Tweet
+			Tweets []*DispTweet
 		}{
 			tweets,
 		})
@@ -199,7 +198,7 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 
 	re.HTML(w, http.StatusOK, "index", struct {
 		Name   string
-		Tweets []*Tweet
+		Tweets []*DispTweet
 	}{
 		name, tweets,
 	})
@@ -370,19 +369,17 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	tweets := make([]*Tweet, 0)
+	tweets := make([]*DispTweet, 0)
 	for rows.Next() {
 		t := Tweet{}
-		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
+		err := rows.Scan(&t)
 		if err != nil && err != sql.ErrNoRows {
 			badRequest(w)
 			fmt.Println(err.Error())
 			return
 		}
-		t.HTML = htmlify(t.Text)
-		t.Time = t.CreatedAt.Format("2006-01-02 15:04:05")
-		t.UserName = user
-		tweets = append(tweets, &t)
+
+		tweets = append(tweets, &DispTweet{user, htmlify(t.Text), t.CreatedAt.Format("2006-01-02 15:04:05")})
 
 		if len(tweets) == perPage {
 			break
@@ -392,7 +389,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	add := r.URL.Query().Get("append")
 	if add != "" {
 		re.HTML(w, http.StatusOK, "_tweets", struct {
-			Tweets []*Tweet
+			Tweets []*DispTweet
 		}{
 			tweets,
 		})
@@ -402,7 +399,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	re.HTML(w, http.StatusOK, "user", struct {
 		Name     string
 		User     string
-		Tweets   []*Tweet
+		Tweets   []*DispTweet
 		IsFriend bool
 		Mypage   bool
 	}{
@@ -444,7 +441,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	tweets := make([]*Tweet, 0)
+	tweets := make([]*DispTweet, 0)
 	for rows.Next() {
 		t := Tweet{}
 		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
@@ -453,16 +450,15 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err.Error())
 			return
 		}
-		t.HTML = htmlify(t.Text)
-		t.Time = t.CreatedAt.Format("2006-01-02 15:04:05")
-		t.UserName = getUserName(t.UserID)
-		if t.UserName == "" {
+		userName := getUserName(t.UserID)
+		if userName == "" {
 			badRequest(w)
 			fmt.Println("non username")
 			return
 		}
-		if strings.Index(t.HTML, query) != -1 {
-			tweets = append(tweets, &t)
+		html := htmlify(t.Text)
+		if strings.Index(html, query) != -1 {
+			tweets = append(tweets, &DispTweet{userName, html, t.CreatedAt.Format("2006-01-02 15:04:05")})
 		}
 
 		if len(tweets) == perPage {
@@ -473,7 +469,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	add := r.URL.Query().Get("append")
 	if add != "" {
 		re.HTML(w, http.StatusOK, "_tweets", struct {
-			Tweets []*Tweet
+			Tweets []*DispTweet
 		}{
 			tweets,
 		})
@@ -482,7 +478,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	re.HTML(w, http.StatusOK, "search", struct {
 		Name   string
-		Tweets []*Tweet
+		Tweets []*DispTweet
 		Query  string
 	}{
 		name, tweets, query,
