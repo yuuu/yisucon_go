@@ -149,9 +149,9 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 	if until == "" {
-		rows, err = db.Query(`SELECT tweets.id, tweets.user_id, tweets.text, tweets.created_at FROM tweets INNER JOIN friends ON tweets.user_id=friends.friend_id WHERE friends.enable=1 AND friends.user_id=? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), perPage)
+		rows, err = db.Query(`SELECT tweets.id, tweets.user_id, tweets.text, tweets.created_at FROM tweets INNER JOIN friends ON tweets.user_id=friends.friend_id WHERE friends.user_id=? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), perPage)
 	} else {
-		rows, err = db.Query(`SELECT tweets.id, tweets.user_id, tweets.text, tweets.created_at FROM tweets INNER JOIN friends ON tweets.user_id=friends.friend_id WHERE friends.enable=1 AND friends.user_id=? AND created_at < ? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), until, perPage)
+		rows, err = db.Query(`SELECT tweets.id, tweets.user_id, tweets.text, tweets.created_at FROM tweets INNER JOIN friends ON tweets.user_id=friends.friend_id WHERE friends.user_id=? AND created_at < ? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), until, perPage)
 	}
 
 	if err != nil {
@@ -275,7 +275,7 @@ func followHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := db.Exec(`UPDATE friends SET enable = 1 WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
+	_, err := db.Exec(`INSERT INTO friends (user_id, friend_id) VALUES (?, ?)`, userID, getuserID(r.FormValue("user")))
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
@@ -293,7 +293,7 @@ func unfollowHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := db.Exec(`UPDATE friends SET enable = 0 WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
+	_, err := db.Exec(`DELETE FROM friends WHERE user_id = ? AND friend_id = ?`, userID, getuserID(r.FormValue("user")))
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
