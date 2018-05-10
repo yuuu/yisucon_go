@@ -149,10 +149,9 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 	if until == "" {
-		rows, err = db.Query(`SELECT tweets.id, tweets.user_id, tweets.text, tweets.created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) ORDER BY tweets.id DESC LIMIT ?`, userID.(int), perPage)
+		rows, err = db.Query(`SELECT id, user_id, text, created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) ORDER BY tweets.id DESC LIMIT ?`, userID.(int), perPage)
 	} else {
-		rows, err = db.Query(`SELECT tweets.id, tweets.user_id, tweets.text, tweets.created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) AND created_at < ? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), until, perPage)
-		rows, err = db.Query(`SELECT tweets.id, tweets.user_id, tweets.text, tweets.created_at FROM tweets INNER JOIN (SELECT friend_id FROM friends WHERE friends.user_id=?) AS friends ON tweets.user_id=friends.friend_id WHERE created_at < ? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), until, perPage)
+		rows, err = db.Query(`SELECT id, user_id, text, created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) AND created_at < ? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), until, perPage)
 	}
 
 	if err != nil {
