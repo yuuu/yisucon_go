@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha1"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -224,6 +225,13 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	err := row.Scan(&user.ID, &user.Name, &user.Salt, &user.Password)
 	if err != nil && err != sql.ErrNoRows {
 		http.NotFound(w, r)
+		return
+	}
+	if err == sql.ErrNoRows || user.Password != fmt.Sprintf("%x", sha1.Sum([]byte(user.Salt+r.FormValue("password")))) {
+		session := getSession(w, r)
+		session.Values["flush"] = "ログインエラー"
+		session.Save(r, w)
+		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
 	session := getSession(w, r)
