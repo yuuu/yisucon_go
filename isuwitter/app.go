@@ -69,7 +69,7 @@ func getuserID(name string) int {
 
 func getUserName(id int) string {
 	if userNameCache[id] != nil {
-		return *userNameCache[id]
+		return *(userNameCache[id])
 	}
 	row := db.QueryRow(`SELECT name FROM users WHERE id = ?`, id)
 	user := User{}
@@ -77,7 +77,7 @@ func getUserName(id int) string {
 	if err != nil {
 		return ""
 	}
-	userNameCache[id] = &user.Name
+	userNameCache[id] = &(user.Name)
 	return user.Name
 }
 
@@ -124,6 +124,10 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		badRequest(w)
 		fmt.Println(err.Error())
 		return
+	}
+
+	for i := 0; i < 1000; i++ {
+		userNameCache[i] = nil
 	}
 
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
