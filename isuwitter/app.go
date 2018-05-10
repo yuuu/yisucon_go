@@ -177,13 +177,14 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		userName := getUserName(t.UserID)
-		if userName == "" {
+		dtw := DispTweet{"", htmlify(t.Text), t.CreatedAt.Format("2006-01-02 15:04:05")}
+		dtw.UserName = getUserName(t.UserID)
+		if dtw.UserName == "" {
 			badRequest(w)
 			fmt.Println("non username")
 			return
 		}
-		tweets = append(tweets, &DispTweet{userName, htmlify(t.Text), t.CreatedAt.Format("2006-01-02 15:04:05")})
+		tweets = append(tweets, &dtw)
 	}
 
 	add := r.URL.Query().Get("append")
@@ -450,15 +451,15 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(err.Error())
 			return
 		}
-		userName := getUserName(t.UserID)
-		if userName == "" {
+		dtw := DispTweet{"", htmlify(t.Text), t.CreatedAt.Format("2006-01-02 15:04:05")}
+		dtw.UserName = getUserName(t.UserID)
+		if dtw.UserName == "" {
 			badRequest(w)
 			fmt.Println("non username")
 			return
 		}
-		html := htmlify(t.Text)
-		if strings.Index(html, query) != -1 {
-			tweets = append(tweets, &DispTweet{userName, html, t.CreatedAt.Format("2006-01-02 15:04:05")})
+		if strings.Index(dtw.HTML, query) != -1 {
+			tweets = append(tweets, &dtw)
 		}
 
 		if len(tweets) == perPage {
