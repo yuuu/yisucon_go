@@ -423,9 +423,9 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 	if until == "" {
-		rows, err = db.Query(`SELECT * FROM tweets WHERE text LIKE ? ORDER BY id DESC LIMIT ?`, "%"+query+"%", perPage*4)
+		rows, err = db.Query(`SELECT * FROM tweets WHERE text LIKE ? ORDER BY id DESC LIMIT ?`, "%"+query+"%", perPage)
 	} else {
-		rows, err = db.Query(`SELECT * FROM tweets WHERE created_at < ? AND text LIKE ? ORDER BY created_at DESC LIMIT ?`, until, "%"+query+"%", perPage*4)
+		rows, err = db.Query(`SELECT * FROM tweets WHERE created_at < ? AND text LIKE ? ORDER BY created_at DESC LIMIT ?`, until, "%"+query+"%", perPage)
 	}
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -454,13 +454,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("non username")
 			return
 		}
-		if strings.Index(dtw.HTML, query) != -1 {
-			tweets = append(tweets, &dtw)
-		}
-
-		if len(tweets) == perPage {
-			break
-		}
+		tweets = append(tweets, &dtw)
 	}
 
 	add := r.URL.Query().Get("append")
