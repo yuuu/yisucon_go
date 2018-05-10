@@ -149,9 +149,9 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 	if until == "" {
-		rows, err = db.Query(`SELECT * FROM tweets INNER JOIN friends ON tweets.user_id=friends.friend_id WHERE friends.user_id=1 ORDER BY tweets.id DESC LIMIT ?`, perPage)
+		rows, err = db.Query(`SELECT * FROM tweets INNER JOIN friends ON tweets.user_id=friends.friend_id WHERE friends.user_id=? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), perPage)
 	} else {
-		rows, err = db.Query(`SELECT * FROM tweets INNER JOIN friends ON tweets.user_id=friends.friend_id WHERE friends.user_id=1 AND created_at < ? ORDER BY tweets.id DESC LIMIT ?`, until, perPage)
+		rows, err = db.Query(`SELECT * FROM tweets INNER JOIN friends ON tweets.user_id=friends.friend_id WHERE friends.user_id=? AND created_at < ? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), until, perPage)
 	}
 
 	if err != nil {
