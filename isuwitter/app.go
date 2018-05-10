@@ -335,25 +335,34 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	isFriend := false
+	var rows *sql.Rows
+	var err error
 	if name != "" {
-		result, err := loadFriends(sessionUID.(int))
+		rows, err := db.Query(`SELECT id FROM friends WHERE user_id = ? AND friend_id = ?`, sessionUID.(int), userID)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				http.NotFound(w, r)
+				return
+			}
 			badRequest(w)
 			fmt.Println(err.Error())
 			return
 		}
-
-		for _, x := range result {
-			if x == userID {
+		for rows.Next() {
+			id := 0
+			err := rows.Scan(&id)
+			if err != nil && err != sql.ErrNoRows {
+				badRequest(w)
+				fmt.Println(err.Error())
+				return
+			}
+			if 0 != id {
 				isFriend = true
-				break
 			}
 		}
 	}
 
 	until := r.URL.Query().Get("until")
-	var rows *sql.Rows
-	var err error
 	if until == "" {
 		rows, err = db.Query(`SELECT * FROM tweets WHERE user_id = ? ORDER BY id DESC LIMIT ?`, userID, perPage)
 	} else {
