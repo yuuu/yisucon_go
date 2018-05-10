@@ -88,23 +88,6 @@ func htmlify(tweet string) string {
 	return tweet
 }
 
-func loadFriends(userID int) ([]int, error) {
-	friends := make([]int, 0)
-	rows, err := db.Query("SELECT friend_id FROM friends WHERE user_id = ?", userID)
-	if err != nil {
-		return nil, err
-	}
-	for rows.Next() {
-		id := 0
-		err := rows.Scan(&id)
-		if err != nil && err != sql.ErrNoRows {
-			return nil, err
-		}
-		friends = append(friends, id)
-	}
-	return friends, nil
-}
-
 func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := db.Exec(`DELETE FROM tweets WHERE id > 100000`)
 	if err != nil {
@@ -246,6 +229,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if err == sql.ErrNoRows || user.Password != fmt.Sprintf("%x", sha1.Sum([]byte(user.Salt+r.FormValue("password")))) {
 		session := getSession(w, r)
+		fmt.Println("ログインエラー")
 		session.Values["flush"] = "ログインエラー"
 		session.Save(r, w)
 		http.Redirect(w, r, "/", http.StatusFound)
