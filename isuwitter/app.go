@@ -186,8 +186,9 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 func tweetPostHandler(w http.ResponseWriter, r *http.Request) {
 	session := getSession(w, r)
 	userID, ok := session.Values["user_id"]
+	u := ""
 	if ok {
-		u := getUserName(userID.(int))
+		u = getUserName(userID.(int))
 		if u == "" {
 			http.Redirect(w, r, "/", http.StatusFound)
 			return
@@ -203,7 +204,7 @@ func tweetPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := db.Exec(`INSERT INTO tweets (user_id, text, created_at) VALUES (?, ?, NOW())`, userID, text)
+	_, err := db.Exec(`INSERT INTO tweets (user_id, text, created_at, user_name) VALUES (?, ?, NOW(), ?)`, userID, text, u)
 	if err != nil {
 		badRequest(w)
 		fmt.Println(err.Error())
@@ -360,7 +361,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	tweets := make([]*DispTweet, 0)
 	for rows.Next() {
 		t := Tweet{}
-		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
+		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt, &t.UserName)
 		if err != nil && err != sql.ErrNoRows {
 			badRequest(w)
 			fmt.Println(err.Error())
@@ -428,7 +429,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	tweets := make([]*DispTweet, 0)
 	for rows.Next() {
 		t := Tweet{}
-		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
+		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt, &t.UserName)
 		if err != nil && err != sql.ErrNoRows {
 			badRequest(w)
 			fmt.Println(err.Error())
@@ -490,9 +491,9 @@ func fileRead(fp string) []byte {
 }
 
 func main() {
-	go func() {
-		fmt.Println(http.ListenAndServe("localhost:6060", nil))
-	}()
+	// go func() {
+	// 	fmt.Println(http.ListenAndServe("localhost:6060", nil))
+	// }()
 
 	host := os.Getenv("ISUWITTER_DB_HOST")
 	if host == "" {
