@@ -108,21 +108,22 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		rows, err := db.Query(`SELECT * FROM friends`)
 		if err != nil {
+			fmt.Println("error 1")
 			return
 		}
+		id := 0
+		user_id := 0
+		friend_id := 0
+		friend_name := ""
 		for rows.Next() {
-			id := 0
-			user_id := 0
-			friend_id := 0
-			friend_name := ""
 			err := rows.Scan(&id, &user_id, &friend_id, &friend_name)
 			if err != nil && err != sql.ErrNoRows {
+				fmt.Println("error 2")
 				return
 			}
 			_, err = db.Exec(`UPDATE friends SET friend_name = ? WHERE id = ?`, getUserName(friend_id), id)
 			if err != nil {
-				badRequest(w)
-				fmt.Println(err.Error())
+				fmt.Println("error 3")
 				return
 			}
 		}
