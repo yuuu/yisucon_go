@@ -69,12 +69,12 @@ func getuserID(name string) int {
 
 func getUserName(id int) string {
 	row := db.QueryRow(`SELECT name FROM users WHERE id = ?`, id)
-	user := User{}
-	err := row.Scan(&user.Name)
+	name := ""
+	err := row.Scan(&name)
 	if err != nil {
 		return ""
 	}
-	return user.Name
+	return name
 }
 
 func htmlify(tweet string) string {
