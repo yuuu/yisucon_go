@@ -106,7 +106,7 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go func() {
-		rows, err := db.Query(`SELECT * FROM friends`)
+		rows, err := db.Query(`SELECT id, user_id, friend_id FROM friends`)
 		if err != nil {
 			fmt.Println("error 1")
 			return
@@ -114,9 +114,8 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		id := 0
 		user_id := 0
 		friend_id := 0
-		friend_name := ""
 		for rows.Next() {
-			err := rows.Scan(&id, &user_id, &friend_id, &friend_name)
+			err := rows.Scan(&id, &user_id, &friend_id)
 			if err != nil && err != sql.ErrNoRows {
 				fmt.Println("error 2")
 				return
