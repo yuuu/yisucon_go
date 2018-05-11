@@ -8,7 +8,6 @@ import (
 	"html"
 	"html/template"
 	"log"
-	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -496,12 +495,9 @@ func fileRead(fp string) []byte {
 }
 
 func main() {
-	listen, err := net.Listen("tcp", ":0")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Listening on %s\n", listen.Addr())
-	go http.Serve(listen, nil)
+	go func() {
+		fmt.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 
 	host := os.Getenv("ISUWITTER_DB_HOST")
 	if host == "" {
@@ -521,6 +517,7 @@ func main() {
 		dbname = "isuwitter"
 	}
 
+	var err error
 	db, err = sql.Open("mysql", fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&loc=Local&parseTime=true",
 		user, password, host, port, dbname,
