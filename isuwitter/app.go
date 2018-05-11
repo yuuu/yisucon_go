@@ -28,6 +28,7 @@ type Tweet struct {
 	UserID    int
 	Text      string
 	CreatedAt time.Time
+	UserName  string
 }
 
 type DispTweet struct {
@@ -105,30 +106,6 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go func() {
-		rows, err := db.Query(`SELECT id, user_id, friend_id FROM friends`)
-		if err != nil {
-			fmt.Println("error 1")
-			return
-		}
-		id := 0
-		user_id := 0
-		friend_id := 0
-		for rows.Next() {
-			err := rows.Scan(&id, &user_id, &friend_id)
-			if err != nil && err != sql.ErrNoRows {
-				fmt.Println("error 2")
-				return
-			}
-			_, err = db.Exec(`UPDATE friends SET friend_name = ? WHERE id = ?`, getUserName(friend_id), id)
-			if err != nil {
-				fmt.Println("error 3")
-				return
-			}
-		}
-
-	}()
-
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
 }
 
@@ -160,9 +137,9 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 	if until == "" {
-		rows, err = db.Query(`SELECT id, user_id, text, created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) ORDER BY tweets.id DESC LIMIT ?`, userID.(int), perPage)
+		rows, err = db.Query(`SELECT id, user_name, text, created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) ORDER BY tweets.id DESC LIMIT ?`, userID.(int), perPage)
 	} else {
-		rows, err = db.Query(`SELECT id, user_id, text, created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) AND created_at < ? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), until, perPage)
+		rows, err = db.Query(`SELECT id, user_name, text, created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) AND created_at < ? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), until, perPage)
 	}
 
 	if err != nil {
@@ -179,21 +156,13 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	tweets := make([]*DispTweet, 0)
 	for rows.Next() {
 		t := Tweet{}
-		err := rows.Scan(&t.ID, &t.UserID, &t.Text, &t.CreatedAt)
+		err := rows.Scan(&t.ID, &t.UserName, &t.Text, &t.CreatedAt)
 		if err != nil && err != sql.ErrNoRows {
 			badRequest(w)
 			fmt.Println(err.Error())
 			return
 		}
-
-		dtw := DispTweet{"", htmlify(t.Text), t.CreatedAt.Format("2006-01-02 15:04:05")}
-		dtw.UserName = getUserName(t.UserID)
-		if dtw.UserName == "" {
-			badRequest(w)
-			fmt.Println("non username")
-			return
-		}
-		tweets = append(tweets, &dtw)
+		tweets = append(tweets, &DispTweet{t.UserName, htmlify(t.Text), t.CreatedAt.Format("2006-01-02 15:04:05")})
 	}
 
 	add := r.URL.Query().Get("append")
