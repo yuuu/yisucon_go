@@ -105,6 +105,30 @@ func initializeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go func() {
+		rows, err := db.Query(`SELECT * FROM friends`)
+		if err != nil {
+			return
+		}
+		for rows.Next() {
+			id := 0
+			user_id := 0
+			friend_id := 0
+			friend_name := ""
+			err := rows.Scan(&id, &user_id, &friend_id, &friend_name)
+			if err != nil && err != sql.ErrNoRows {
+				return
+			}
+			_, err = db.Exec(`UPDATE friends SET friend_name = ? WHERE id = ?`, getUserName(friend_id), id)
+			if err != nil {
+				badRequest(w)
+				fmt.Println(err.Error())
+				return
+			}
+		}
+
+	}()
+
 	re.JSON(w, http.StatusOK, map[string]string{"result": "ok"})
 }
 
