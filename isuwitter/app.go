@@ -56,7 +56,7 @@ var (
 )
 
 func getuserID(name string) int {
-	row := db.QueryRow(`SELECT id FROM users WHERE name = ? LIMIT 1`, name)
+	row := db.QueryRow(`SELECT id FROM users WHERE name = ?`, name)
 	user := User{}
 	err := row.Scan(&user.ID)
 	if err != nil {
@@ -66,7 +66,7 @@ func getuserID(name string) int {
 }
 
 func getUserName(id int) string {
-	row := db.QueryRow(`SELECT name FROM users WHERE id = ? LIMIT 1`, id)
+	row := db.QueryRow(`SELECT name FROM users WHERE id = ?`, id)
 	user := User{}
 	err := row.Scan(&user.Name)
 	if err != nil {
