@@ -337,7 +337,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			if 0 != id {
 				isFriend = true
-				return
+				break
 			}
 		}
 	}
