@@ -328,8 +328,16 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for rows.Next() {
-			isFriend = true
-			break
+			id := 0
+			err := rows.Scan(&id)
+			if err != nil && err != sql.ErrNoRows {
+				badRequest(w)
+				fmt.Println(err.Error())
+				return
+			}
+			if 0 != id {
+				isFriend = true
+			}
 		}
 	}
 
