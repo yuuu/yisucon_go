@@ -137,9 +137,9 @@ func topHandler(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 	if until == "" {
-		rows, err = db.Query(`SELECT id, user_name, text, created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) ORDER BY tweets.id DESC LIMIT ?`, userID.(int), perPage)
+		rows, err = db.Query(`SELECT id, user_name, text, created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) ORDER BY tweets.id DESC LIMIT 50`, userID.(int))
 	} else {
-		rows, err = db.Query(`SELECT id, user_name, text, created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) AND created_at < ? ORDER BY tweets.id DESC LIMIT ?`, userID.(int), until, perPage)
+		rows, err = db.Query(`SELECT id, user_name, text, created_at FROM tweets WHERE user_id IN (SELECT friend_id FROM friends WHERE user_id=?) AND created_at < ? ORDER BY tweets.id DESC LIMIT 50`, userID.(int), until)
 	}
 
 	if err != nil {
